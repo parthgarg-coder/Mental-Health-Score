@@ -7,7 +7,7 @@
 'use strict';
 
 /* ---------- Config ---------- */
-const API_BASE = 'https://mental-health-score-1-1ctu.onrender.com';
+const API_BASE = 'http://127.0.0.1:8000';
 const PREDICT_ENDPOINT = `${API_BASE}/predict`;
 
 /* Field definitions: id -> validation rule.
@@ -158,22 +158,25 @@ function showToast(message, type = 'info', duration = 4200) {
    Result gauge
    ========================================================= */
 
+// Model outputs a score on a 0–10 scale (not 0–100).
 function colorForScore(score) {
-    if (score >= 80) return getComputedStyle(document.documentElement).getPropertyValue('--success').trim();
-    if (score >= 60) return getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
+    if (score >= 8) return getComputedStyle(document.documentElement).getPropertyValue('--success').trim();
+    if (score >= 6) return getComputedStyle(document.documentElement).getPropertyValue('--warning').trim();
     return getComputedStyle(document.documentElement).getPropertyValue('--danger').trim();
 }
 
 function messageForScore(score) {
-    if (score >= 80) return 'Excellent! Your digital habits appear well balanced.';
-    if (score >= 60) return "You're doing okay, but there's room to improve your habits.";
+    if (score >= 8) return 'Excellent! Your digital habits appear well balanced.';
+    if (score >= 6) return "You're doing okay, but there's room to improve your habits.";
     return 'Consider reducing screen time and improving sleep and study balance.';
 }
 
 /** Animate the circular gauge and count-up score readout. */
+const SCORE_MAX = 10; // model's predicted_mental_health_score is on a 0–10 scale
+
 function renderResult(score) {
-    const clamped = Math.max(0, Math.min(100, score));
-    const offset = GAUGE_CIRCUMFERENCE - (clamped / 100) * GAUGE_CIRCUMFERENCE;
+    const clamped = Math.max(0, Math.min(SCORE_MAX, score));
+    const offset = GAUGE_CIRCUMFERENCE - (clamped / SCORE_MAX) * GAUGE_CIRCUMFERENCE;
 
     gaugeProgress.style.stroke = colorForScore(clamped);
     // Force reflow so the transition reliably animates from the reset state.
@@ -183,7 +186,7 @@ function renderResult(score) {
         gaugeProgress.style.strokeDashoffset = `${offset}`;
     });
 
-    animateCountUp(score);
+    animateCountUp(clamped);
     resultMessage.textContent = messageForScore(clamped);
 
     resultSection.hidden = false;
