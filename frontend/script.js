@@ -7,7 +7,7 @@
 'use strict';
 
 /* ---------- Config ---------- */
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = 'https://mental-health-score-1-1ctu.onrender.com';
 const PREDICT_ENDPOINT = `${API_BASE}/predict`;
 
 /* Field definitions: id -> validation rule.
